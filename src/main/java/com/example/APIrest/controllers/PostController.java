@@ -1,17 +1,13 @@
 package com.example.APIrest.controllers;
 
+import com.example.APIrest.exceptions.PostNotFoundException;
 import com.example.APIrest.models.Post;
-import com.example.APIrest.models.Utilisateur;
-import com.example.APIrest.repository.PostRepository;
-import com.example.APIrest.repository.UtilisateurRepository;
 import com.example.APIrest.services.PostService;
-import com.example.APIrest.services.UtilisateurService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
+
 @RestController
 @RequestMapping(path = "api/v1/posts")
 public class PostController {
@@ -23,9 +19,10 @@ public class PostController {
             return postService.getALLPost();
         }
         @GetMapping("/posts/{id}")
-        public Optional<Post> getUser(Long id)
+        public Post getPost(Long id)
         {
-            return postService.getPost(id);
+            return postService.getPost(id)
+            .orElseThrow(() -> new PostNotFoundException(id));
         }
         @PostMapping("/posts")
         public Post create(@RequestBody  Post post)
@@ -38,8 +35,9 @@ public class PostController {
             return postService.update(post,id);
         }
         @RequestMapping(value="id",method = RequestMethod.DELETE)
-        public void delete(@PathVariable Long id)
+        public void delete(@PathVariable Long id) throws PostNotFoundException
         {
             postService.delete(id);
+
         }
 }
